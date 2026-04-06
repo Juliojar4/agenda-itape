@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Secretaria {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  sigla     String
+  telefone  String?
+  email     String?
+  icone     String   @default("🏛️")
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("data_cadastro")
+
+  unidades UnidadeAtendimento[]
+  servicos Servico[]
+  usuarios Usuario[]
+
+  @@map("secretaria")
+}
+
+model UnidadeAtendimento {
+  id           Int      @id @default(autoincrement())
+  secretariaId Int      @map("id_secretaria")
+  nome         String
+  endereco     String
+  bairro       String
+  cep          String?
+  telefone     String?
+  latitude     Float?
+  longitude    Float?
+  ativo        Boolean  @default(true)
+
+  secretaria   Secretaria         @relation(fields: [secretariaId], references: [id])
+  agendas      Agenda[]
+  agendamentos Agendamento[]
+  usuarios     Usuario[]
+
+  @@map("unidade_atendimento")
+}
+
+model Servico {
+  id                    Int      @id @default(autoincrement())
+  secretariaId          Int      @map("id_secretaria")
+  nome                  String
+  descricao             String?
+  tempoMedioMinutos     Int      @default(30) @map("tempo_medio_minutos")
+  documentosNecessarios String?  @map("documentos_necessarios")
+  ativo                 Boolean  @default(true)
+  createdAt             DateTime @default(now()) @map("data_cadastro")
+
+  secretaria   Secretaria    @relation(fields: [secretariaId], references: [id])
+  agendas      Agenda[]
+  agendamentos Agendamento[]
+
+  @@map("servico")
+}
+
+model Cidadao {
+  id                 Int      @id @default(autoincrement())
+  nome               String
+  cpf                String   @unique
+  dataNascimento     DateTime @map("data_nascimento")
+  sexo               String
+  endereco           String?
+  bairro             String?
+  cep                String?
+  telefone           String?
+  email              String?
+  senhaHash          String   @map("senha_hash")
+  aceiteLgpd         Boolean  @default(false) @map("aceite_lgpd")
+  aceiteNotificacoes Boolean  @default(true) @map("aceite_notificacoes")
+  ativo              Boolean  @default(true)
+  createdAt          DateTime @default(now()) @map("data_cadastro")
+
+  agendamentos Agendamento[]
+  notificacoes Notificacao[]
+
+  @@index([cpf])
+  @@index([bairro])
+  @@map("cidadao")
+}
+
+model PerfilAcesso {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique
+  descricao String?
+
+  usuarios Usuario[]
+
+  @@map("perfil_acesso")
+}
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  cpf             String    @unique
+  email           String    @unique
+  senhaHash       String    @map("senha_hash")
+  perfilId        Int       @map("id_perfil")
+  secretariaId    Int?      @map("id_secretaria")
+  unidadeId       Int?      @map("id_unidade")
+  ativo           Boolean   @default(true)
+  tentativasLogin Int       @default(0) @map("tentativas_login")
+  bloqueadoAte    DateTime? @map("bloqueado_ate")
+  createdAt       DateTime  @default(now()) @map("data_cadastro")
+
+  perfil       PerfilAcesso        @relation(fields: [perfilId], references: [id])
+  secretaria   Secretaria?         @relation(fields: [secretariaId], references: [id])
+  unidade      UnidadeAtendimento? @relation(fields: [unidadeId], references: [id])
+  atendimentos Atendimento[]
+  logs         LogAuditoria[]
+
+  @@map("usuario")
+}
+
+model Agenda {
+  id               Int      @id @default(autoincrement())
+  servicoId        Int      @map("id_servico")
+  unidadeId        Int      @map("id_unidade")
+  dataDisponivel   DateTime @map("data_disponivel")
+  horaInicio       DateTime @map("hora_inicio")
+  horaFim          DateTime @map("hora_fim")
+  vagasTotal       Int      @default(1) @map("vagas_total")
+  vagasDisponiveis Int      @default(1) @map("vagas_disponiveis")
+  ativo            Boolean  @default(true)
+
+  servico      Servico            @relation(fields: [servicoId], references: [id])
+  unidade      UnidadeAtendimento @relation(fields: [unidadeId], references: [id])
+  agendamentos Agendamento[]
+
+  @@index([dataDisponivel, servicoId])
+  @@index([unidadeId, dataDisponivel])
+  @@map("agenda")
+}
+
+model Agendamento {
+  id                 Int      @id @default(autoincrement())
+  cidadaoId          Int      @map("id_cidadao")
+  agendaId           Int      @map("id_agenda")
+  servicoId          Int      @map("id_servico")
+  unidadeId          Int      @map("id_unidade")
+  dataAgendamento    DateTime @map("data_agendamento")
+  horaAgendamento    DateTime @map("hora_agendamento")
+  status             String   @default("AGENDADO")
+  motivoCancelamento String?  @map("motivo_cancelamento")
+  createdAt          DateTime @default(now()) @map("data_criacao")
+  updatedAt          DateTime @updatedAt @map("data_atualizacao")
+
+  cidadao      Cidadao            @relation(fields: [cidadaoId], references: [id])
+  agenda       Agenda             @relation(fields: [agendaId], references: [id])
+  servico      Servico            @relation(fields: [servicoId], references: [id])
+  unidade      UnidadeAtendimento @relation(fields: [unidadeId], references: [id])
+  atendimento  Atendimento?
+  notificacoes Notificacao[]
+
+  @@index([cidadaoId, dataAgendamento])
+  @@index([status])
+  @@index([dataAgendamento])
+  @@map("agendamento")
+}
+
+model Atendimento {
+  id                  Int      @id @default(autoincrement())
+  agendamentoId       Int      @unique @map("id_agendamento")
+  usuarioAtendenteId  Int      @map("id_usuario_atendente")
+  status              String
+  tempoEfetivoMinutos Int?     @map("tempo_efetivo_minutos")
+  observacoes         String?
+  createdAt           DateTime @default(now()) @map("data_registro")
+
+  agendamento Agendamento @relation(fields: [agendamentoId], references: [id])
+  atendente   Usuario     @relation(fields: [usuarioAtendenteId], references: [id])
+
+  @@map("atendimento")
+}
+
+model Notificacao {
+  id            Int      @id @default(autoincrement())
+  cidadaoId     Int      @map("id_cidadao")
+  agendamentoId Int?     @map("id_agendamento")
+  tipo          String
+  canal         String   @default("EMAIL")
+  titulo        String
+  mensagem      String
+  enviada       Boolean  @default(false)
+  dataEnvio     DateTime? @map("data_envio")
+  createdAt     DateTime @default(now()) @map("data_criacao")
+
+  cidadao     Cidadao      @relation(fields: [cidadaoId], references: [id])
+  agendamento Agendamento? @relation(fields: [agendamentoId], references: [id])
+
+  @@index([enviada, createdAt])
+  @@map("notificacao")
+}
+
+model LogAuditoria {
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int?     @map("id_usuario")
+  acao            String
+  tabelaAfetada   String?  @map("tabela_afetada")
+  registroId      Int?     @map("registro_id")
+  dadosAnteriores String?  @map("dados_anteriores")
+  dadosNovos      String?  @map("dados_novos")
+  ipOrigem        String?  @map("ip_origem")
+  createdAt       DateTime @default(now()) @map("data_registro")
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId, createdAt])
+  @@index([tabelaAfetada])
+  @@map("log_auditoria")
+}
