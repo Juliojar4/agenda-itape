@@ -66,7 +66,7 @@ export async function PATCH(
       // Create Atendimento record for terminal statuses
       if (status === "REALIZADO" || status === "NAO_COMPARECEU") {
         await tx.atendimento.upsert({
-          where: { agendamentoId },
+          where: { agendamentoId: id },
           create: {
             agendamentoId: id,
             usuarioAtendenteId: usuarioId,
