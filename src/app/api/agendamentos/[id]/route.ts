@@ -29,7 +29,7 @@ export async function PATCH(
 
     if (agendamento.status !== "AGENDADO") {
       return NextResponse.json(
-        { error: "Apenas agendamentos com status AGENDADO podem ser cancelados" },
+        { error: "Apenas e agendamentos com status AGENDADO podem ser cancelados" },
         { status: 400 }
       )
     }
