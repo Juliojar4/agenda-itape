@@ -22,7 +22,7 @@ export default async function PainelAgendamentosPage() {
   const whereBase = {
     dataAgendamento: { gte: inicio, lte: fim },
     ...(perfilNome === "ATENDENTE" && unidadeId
-      ? { unidadeId: Number(unidadeId) }
+      ? { unidadeId }
       : {}),
   }
 

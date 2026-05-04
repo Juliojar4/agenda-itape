@@ -36,9 +36,9 @@ export const cadastroCidadaoSchema = z.object({
 })
 
 export const criarAgendamentoSchema = z.object({
-  agendaId: z.number().int().positive(),
-  servicoId: z.number().int().positive(),
-  unidadeId: z.number().int().positive(),
+  agendaId: z.string(),
+  servicoId: z.string(),
+  unidadeId: z.string(),
 })
 
 export const cancelarAgendamentoSchema = z.object({

@@ -22,7 +22,7 @@ export default async function ConfirmacaoPage({
   const { agendamentoId } = await params
 
   const agendamento = await prisma.agendamento.findUnique({
-    where: { id: Number(agendamentoId) },
+    where: { id: agendamentoId },
     include: {
       servico: { include: { secretaria: true } },
       unidade: true,
@@ -30,7 +30,7 @@ export default async function ConfirmacaoPage({
     },
   })
 
-  if (!agendamento || agendamento.cidadaoId !== Number(session.user.id)) {
+  if (!agendamento || agendamento.cidadaoId !== session.user.id) {
     redirect("/meus-agendamentos")
   }
 

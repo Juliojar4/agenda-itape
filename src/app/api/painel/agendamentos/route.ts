@@ -25,10 +25,8 @@ export async function GET(request: Request) {
     // Atendentes see only their unidade
     const unidadeFiltro =
       perfilNome === "ATENDENTE" && unidadeId
-        ? Number(unidadeId)
-        : unidadeParam
-          ? Number(unidadeParam)
-          : undefined
+        ? unidadeId
+        : unidadeParam || undefined
 
     const agendamentos = await prisma.agendamento.findMany({
       where: {

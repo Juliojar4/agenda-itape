@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     const whereBase = {
       dataAgendamento: { gte: inicio, lte: fim },
       ...(perfilNome === "ATENDENTE" && unidadeId
-        ? { unidadeId: Number(unidadeId) }
+        ? { unidadeId }
         : {}),
     }
 

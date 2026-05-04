@@ -3,14 +3,14 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ServicoComSecretaria, Secretaria } from "@/types"
 
-async function fetchServicos(secretariaId?: number | null): Promise<ServicoComSecretaria[]> {
+async function fetchServicos(secretariaId?: string | null): Promise<ServicoComSecretaria[]> {
   const params = secretariaId ? `?secretariaId=${secretariaId}` : ""
   const res = await fetch(`/api/servicos${params}`)
   if (!res.ok) throw new Error("Erro ao carregar servicos")
   return res.json()
 }
 
-export function useServicos(secretariaId?: number | null) {
+export function useServicos(secretariaId?: string | null) {
   return useQuery({
     queryKey: ["servicos", secretariaId],
     queryFn: () => fetchServicos(secretariaId),
@@ -20,7 +20,7 @@ export function useServicos(secretariaId?: number | null) {
 export function useSecretarias() {
   const { data: servicos, ...rest } = useServicos()
   const secretarias: Secretaria[] = []
-  const seen = new Set<number>()
+  const seen = new Set<string>()
   servicos?.forEach((s) => {
     if (!seen.has(s.secretaria.id)) {
       seen.add(s.secretaria.id)

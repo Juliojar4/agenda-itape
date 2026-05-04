@@ -35,7 +35,7 @@ export default async function PainelDashboard() {
   const whereBase = {
     dataAgendamento: { gte: inicio, lte: fim },
     ...(perfilNome === "ATENDENTE" && unidadeId
-      ? { unidadeId: Number(unidadeId) }
+      ? { unidadeId }
       : {}),
   }
 

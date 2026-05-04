@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Secretaria {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   nome      String
   sigla     String
   telefone  String?
@@ -25,8 +25,8 @@ model Secretaria {
 }
 
 model UnidadeAtendimento {
-  id           Int      @id @default(autoincrement())
-  secretariaId Int      @map("id_secretaria")
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  secretariaId String  @map("id_secretaria") @db.ObjectId
   nome         String
   endereco     String
   bairro       String
@@ -34,9 +34,9 @@ model UnidadeAtendimento {
   telefone     String?
   latitude     Float?
   longitude    Float?
-  ativo        Boolean  @default(true)
+  ativo        Boolean @default(true)
 
-  secretaria   Secretaria         @relation(fields: [secretariaId], references: [id])
+  secretaria   Secretaria    @relation(fields: [secretariaId], references: [id])
   agendas      Agenda[]
   agendamentos Agendamento[]
   usuarios     Usuario[]
@@ -45,8 +45,8 @@ model UnidadeAtendimento {
 }
 
 model Servico {
-  id                    Int      @id @default(autoincrement())
-  secretariaId          Int      @map("id_secretaria")
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  secretariaId          String   @map("id_secretaria") @db.ObjectId
   nome                  String
   descricao             String?
   tempoMedioMinutos     Int      @default(30) @map("tempo_medio_minutos")
@@ -62,7 +62,7 @@ model Servico {
 }
 
 model Cidadao {
-  id                 Int      @id @default(autoincrement())
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
   nome               String
   cpf                String   @unique
   dataNascimento     DateTime @map("data_nascimento")
@@ -81,14 +81,12 @@ model Cidadao {
   agendamentos Agendamento[]
   notificacoes Notificacao[]
 
-  @@index([cpf])
-  @@index([bairro])
   @@map("cidadao")
 }
 
 model PerfilAcesso {
-  id        Int      @id @default(autoincrement())
-  nome      String   @unique
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  nome      String  @unique
   descricao String?
 
   usuarios Usuario[]
@@ -97,14 +95,14 @@ model PerfilAcesso {
 }
 
 model Usuario {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
   nome            String
   cpf             String    @unique
   email           String    @unique
   senhaHash       String    @map("senha_hash")
-  perfilId        Int       @map("id_perfil")
-  secretariaId    Int?      @map("id_secretaria")
-  unidadeId       Int?      @map("id_unidade")
+  perfilId        String    @map("id_perfil") @db.ObjectId
+  secretariaId    String?   @map("id_secretaria") @db.ObjectId
+  unidadeId       String?   @map("id_unidade") @db.ObjectId
   ativo           Boolean   @default(true)
   tentativasLogin Int       @default(0) @map("tentativas_login")
   bloqueadoAte    DateTime? @map("bloqueado_ate")
@@ -120,9 +118,9 @@ model Usuario {
 }
 
 model Agenda {
-  id               Int      @id @default(autoincrement())
-  servicoId        Int      @map("id_servico")
-  unidadeId        Int      @map("id_unidade")
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  servicoId        String   @map("id_servico") @db.ObjectId
+  unidadeId        String   @map("id_unidade") @db.ObjectId
   dataDisponivel   DateTime @map("data_disponivel")
   horaInicio       DateTime @map("hora_inicio")
   horaFim          DateTime @map("hora_fim")
@@ -134,17 +132,15 @@ model Agenda {
   unidade      UnidadeAtendimento @relation(fields: [unidadeId], references: [id])
   agendamentos Agendamento[]
 
-  @@index([dataDisponivel, servicoId])
-  @@index([unidadeId, dataDisponivel])
   @@map("agenda")
 }
 
 model Agendamento {
-  id                 Int      @id @default(autoincrement())
-  cidadaoId          Int      @map("id_cidadao")
-  agendaId           Int      @map("id_agenda")
-  servicoId          Int      @map("id_servico")
-  unidadeId          Int      @map("id_unidade")
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  cidadaoId          String   @map("id_cidadao") @db.ObjectId
+  agendaId           String   @map("id_agenda") @db.ObjectId
+  servicoId          String   @map("id_servico") @db.ObjectId
+  unidadeId          String   @map("id_unidade") @db.ObjectId
   dataAgendamento    DateTime @map("data_agendamento")
   horaAgendamento    DateTime @map("hora_agendamento")
   status             String   @default("AGENDADO")
@@ -159,16 +155,13 @@ model Agendamento {
   atendimento  Atendimento?
   notificacoes Notificacao[]
 
-  @@index([cidadaoId, dataAgendamento])
-  @@index([status])
-  @@index([dataAgendamento])
   @@map("agendamento")
 }
 
 model Atendimento {
-  id                  Int      @id @default(autoincrement())
-  agendamentoId       Int      @unique @map("id_agendamento")
-  usuarioAtendenteId  Int      @map("id_usuario_atendente")
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  agendamentoId       String   @unique @map("id_agendamento") @db.ObjectId
+  usuarioAtendenteId  String   @map("id_usuario_atendente") @db.ObjectId
   status              String
   tempoEfetivoMinutos Int?     @map("tempo_efetivo_minutos")
   observacoes         String?
@@ -181,30 +174,29 @@ model Atendimento {
 }
 
 model Notificacao {
-  id            Int      @id @default(autoincrement())
-  cidadaoId     Int      @map("id_cidadao")
-  agendamentoId Int?     @map("id_agendamento")
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  cidadaoId     String    @map("id_cidadao") @db.ObjectId
+  agendamentoId String?   @map("id_agendamento") @db.ObjectId
   tipo          String
-  canal         String   @default("EMAIL")
+  canal         String    @default("EMAIL")
   titulo        String
   mensagem      String
-  enviada       Boolean  @default(false)
+  enviada       Boolean   @default(false)
   dataEnvio     DateTime? @map("data_envio")
-  createdAt     DateTime @default(now()) @map("data_criacao")
+  createdAt     DateTime  @default(now()) @map("data_criacao")
 
   cidadao     Cidadao      @relation(fields: [cidadaoId], references: [id])
   agendamento Agendamento? @relation(fields: [agendamentoId], references: [id])
 
-  @@index([enviada, createdAt])
   @@map("notificacao")
 }
 
 model LogAuditoria {
-  id              Int      @id @default(autoincrement())
-  usuarioId       Int?     @map("id_usuario")
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  usuarioId       String?  @map("id_usuario") @db.ObjectId
   acao            String
   tabelaAfetada   String?  @map("tabela_afetada")
-  registroId      Int?     @map("registro_id")
+  registroId      String?  @map("registro_id")
   dadosAnteriores String?  @map("dados_anteriores")
   dadosNovos      String?  @map("dados_novos")
   ipOrigem        String?  @map("ip_origem")
@@ -212,7 +204,5 @@ model LogAuditoria {
 
   usuario Usuario? @relation(fields: [usuarioId], references: [id])
 
-  @@index([usuarioId, createdAt])
-  @@index([tabelaAfetada])
   @@map("log_auditoria")
 }

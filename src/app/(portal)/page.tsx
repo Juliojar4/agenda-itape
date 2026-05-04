@@ -12,7 +12,7 @@ export default async function HomePage() {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
 
-  const cidadaoId = Number(session.user.id)
+  const cidadaoId = session.user.id
 
   const proximoAgendamento = await prisma.agendamento.findFirst({
     where: {

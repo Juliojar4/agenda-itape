@@ -20,8 +20,7 @@ export async function PATCH(
     }
 
     const { id } = await params
-    const agendamentoId = Number(id)
-    if (isNaN(agendamentoId)) {
+    if (!id) {
       return NextResponse.json({ error: "ID invalido" }, { status: 400 })
     }
 
@@ -35,10 +34,10 @@ export async function PATCH(
     }
 
     const { status, observacoes, motivoCancelamento } = parsed.data
-    const usuarioId = Number(session.user.id)
+    const usuarioId = session.user.id!
 
     const agendamento = await prisma.agendamento.findUnique({
-      where: { id: agendamentoId },
+      where: { id },
     })
 
     if (!agendamento) {
@@ -55,7 +54,7 @@ export async function PATCH(
 
     const atualizado = await prisma.$transaction(async (tx) => {
       const ag = await tx.agendamento.update({
-        where: { id: agendamentoId },
+        where: { id },
         data: {
           status,
           ...(status === "CANCELADO_PREFEITURA"
@@ -69,7 +68,7 @@ export async function PATCH(
         await tx.atendimento.upsert({
           where: { agendamentoId },
           create: {
-            agendamentoId,
+            agendamentoId: id,
             usuarioAtendenteId: usuarioId,
             status: status === "REALIZADO" ? "REALIZADO" : "NAO_COMPARECEU",
             observacoes,
@@ -85,7 +84,7 @@ export async function PATCH(
       // Restore slot if cancelled by prefeitura
       if (status === "CANCELADO_PREFEITURA") {
         await tx.agenda.update({
-          where: { id: agendamento.agendaId },
+          where: { id: agendamento!.agendaId },
           data: { vagasDisponiveis: { increment: 1 } },
         })
       }

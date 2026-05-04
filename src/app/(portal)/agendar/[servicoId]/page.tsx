@@ -19,7 +19,7 @@ type AgendaData = Record<
   string,
   {
     data: string
-    unidade: { id: number; nome: string; endereco: string; bairro: string }
+    unidade: { id: string; nome: string; endereco: string; bairro: string }
     slots: SlotHorario[]
   }[]
 >
@@ -32,9 +32,9 @@ export default function AgendarPage({
   const { servicoId } = use(params)
   const router = useRouter()
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [selectedSlot, setSelectedSlot] = useState<number | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [selectedUnidade, setSelectedUnidade] = useState<{
-    id: number
+    id: string
     nome: string
   } | null>(null)
 
@@ -46,7 +46,7 @@ export default function AgendarPage({
       queryFn: async () => {
         const res = await fetch(`/api/servicos?id=${servicoId}`)
         const data = await res.json()
-        return Array.isArray(data) ? data.find((s: ServicoComSecretaria) => s.id === Number(servicoId)) : data
+        return Array.isArray(data) ? data.find((s: ServicoComSecretaria) => s.id === servicoId) : data
       },
     })
 
@@ -87,7 +87,7 @@ export default function AgendarPage({
     try {
       const result = await criarAgendamento.mutateAsync({
         agendaId: selectedSlot,
-        servicoId: Number(servicoId),
+        servicoId,
         unidadeId: selectedSlotData.unidade.id,
       })
       toast.success("Agendamento realizado com sucesso!")

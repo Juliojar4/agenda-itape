@@ -5,8 +5,8 @@ import { z } from "zod"
 import { addDays, startOfDay } from "date-fns"
 
 const criarSlotSchema = z.object({
-  servicoId: z.number().int().positive(),
-  unidadeId: z.number().int().positive(),
+  servicoId: z.string(),
+  unidadeId: z.string(),
   data: z.string().min(1),
   horaInicio: z.string().regex(/^\d{2}:\d{2}$/, "Formato HH:MM"),
   horaFim: z.string().regex(/^\d{2}:\d{2}$/, "Formato HH:MM"),
@@ -37,8 +37,8 @@ export async function GET(request: Request) {
       where: {
         dataDisponivel: { gte: hoje, lte: limite },
         ativo: true,
-        ...(servicoId ? { servicoId: Number(servicoId) } : {}),
-        ...(unidadeId ? { unidadeId: Number(unidadeId) } : {}),
+        ...(servicoId ? { servicoId } : {}),
+        ...(unidadeId ? { unidadeId } : {}),
       },
       include: {
         servico: { select: { id: true, nome: true } },

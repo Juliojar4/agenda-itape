@@ -5,8 +5,8 @@ import type { SlotHorario } from "@/types"
 
 interface TimeGridProps {
   slots: SlotHorario[]
-  selectedSlot: number | null
-  onSelect: (agendaId: number) => void
+  selectedSlot: string | null
+  onSelect: (agendaId: string) => void
 }
 
 export function TimeGrid({ slots, selectedSlot, onSelect }: TimeGridProps) {

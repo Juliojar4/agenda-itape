@@ -150,7 +150,7 @@ async function main() {
 
   // Generate agendas for next 14 business days
   const today = new Date()
-  const agendaIds: number[] = []
+  const agendaIds: string[] = []
 
   for (const { servico, unidades } of servicoUnidadeMap) {
     for (const unidade of unidades) {

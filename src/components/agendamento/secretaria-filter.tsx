@@ -5,8 +5,8 @@ import type { Secretaria } from "@/types"
 
 interface SecretariaFilterProps {
   secretarias: Secretaria[]
-  selected: number | null
-  onSelect: (id: number | null) => void
+  selected: string | null
+  onSelect: (id: string | null) => void
 }
 
 export function SecretariaFilter({

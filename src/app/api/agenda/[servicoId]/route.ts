@@ -25,7 +25,7 @@ export async function GET(
 
     const agendas = await prisma.agenda.findMany({
       where: {
-        servicoId: Number(servicoId),
+        servicoId,
         ativo: true,
         dataDisponivel: {
           gte: hoje,
@@ -43,8 +43,8 @@ export async function GET(
       string,
       {
         data: string
-        unidade: { id: number; nome: string; endereco: string; bairro: string }
-        slots: { agendaId: number; hora: string; vagasDisponiveis: number }[]
+        unidade: { id: string; nome: string; endereco: string; bairro: string }
+        slots: { agendaId: string; hora: string; vagasDisponiveis: number }[]
       }[]
     > = {}
 

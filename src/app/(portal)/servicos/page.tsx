@@ -12,8 +12,8 @@ import { useServicos, useSecretarias } from "@/hooks/use-servicos"
 export default function ServicosPage() {
   const searchParams = useSearchParams()
   const initialSec = searchParams.get("sec")
-  const [selectedSec, setSelectedSec] = useState<number | null>(
-    initialSec ? Number(initialSec) : null
+  const [selectedSec, setSelectedSec] = useState<string | null>(
+    initialSec || null
   )
 
   const { data: secretarias, isLoading: loadingSec } = useSecretarias()

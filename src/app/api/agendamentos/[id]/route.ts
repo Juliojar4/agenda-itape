@@ -14,10 +14,10 @@ export async function PATCH(
 
     const { id } = await params
     const body = await request.json()
-    const cidadaoId = Number(session.user.id)
+    const cidadaoId = session.user.id
 
     const agendamento = await prisma.agendamento.findUnique({
-      where: { id: Number(id) },
+      where: { id },
     })
 
     if (!agendamento || agendamento.cidadaoId !== cidadaoId) {
@@ -42,7 +42,7 @@ export async function PATCH(
       })
 
       return tx.agendamento.update({
-        where: { id: Number(id) },
+        where: { id },
         data: {
           status: "CANCELADO_CIDADAO",
           motivoCancelamento: body.motivoCancelamento || null,

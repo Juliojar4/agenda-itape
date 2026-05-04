@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const agendamentos = await prisma.agendamento.findMany({
-      where: { cidadaoId: Number(session.user.id) },
+      where: { cidadaoId: session.user.id },
       include: {
         servico: { include: { secretaria: true } },
         unidade: true,
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     const { agendaId, servicoId, unidadeId } = parsed.data
-    const cidadaoId = Number(session.user.id)
+    const cidadaoId = session.user.id
 
     // Check agenda exists and has availability
     const agenda = await prisma.agenda.findUnique({

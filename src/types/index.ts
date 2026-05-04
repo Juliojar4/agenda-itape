@@ -26,7 +26,7 @@ export type AgendamentoCompleto = Agendamento & {
 }
 
 export type SlotHorario = {
-  agendaId: number
+  agendaId: string
   hora: string
   vagasDisponiveis: number
 }

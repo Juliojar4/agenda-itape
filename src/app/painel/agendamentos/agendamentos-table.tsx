@@ -17,12 +17,12 @@ import {
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants"
 import { cn, formatCPF, formatPhone } from "@/lib/utils"
 
-type Cidadao = { id: number; nome: string; cpf: string; telefone: string | null }
+type Cidadao = { id: string; nome: string; cpf: string; telefone: string | null }
 type Servico = { nome: string; secretaria: { sigla: string; icone: string } }
-type Unidade = { id: number; nome: string }
+type Unidade = { id: string; nome: string }
 
 type Agendamento = {
-  id: number
+  id: string
   status: string
   horaAgendamento: string
   cidadao: Cidadao
@@ -50,8 +50,8 @@ export function AgendamentosTable({ agendamentos: inicial, unidades, isAtendente
   const [agendamentos, setAgendamentos] = useState(inicial)
   const [statusFiltro, setStatusFiltro] = useState("")
   const [unidadeFiltro, setUnidadeFiltro] = useState("")
-  const [expandido, setExpandido] = useState<number | null>(null)
-  const [loading, setLoading] = useState<number | null>(null)
+  const [expandido, setExpandido] = useState<string | null>(null)
+  const [loading, setLoading] = useState<string | null>(null)
 
   const filtrados = agendamentos.filter((ag) => {
     if (statusFiltro && ag.status !== statusFiltro) return false
@@ -60,7 +60,7 @@ export function AgendamentosTable({ agendamentos: inicial, unidades, isAtendente
   })
 
   async function atualizarStatus(
-    id: number,
+    id: string,
     status: string,
     extra?: { observacoes?: string; motivoCancelamento?: string }
   ) {

@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const servicos = await prisma.servico.findMany({
       where: {
         ativo: true,
-        ...(secretariaId ? { secretariaId: Number(secretariaId) } : {}),
+        ...(secretariaId ? { secretariaId } : {}),
       },
       include: {
         secretaria: true,

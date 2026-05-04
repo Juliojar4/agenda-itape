@@ -6,17 +6,17 @@ import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
 import { Plus, CalendarPlus, Users, Clock } from "lucide-react"
 
-type Servico = { id: number; nome: string; secretaria: { sigla: string } }
-type Unidade = { id: number; nome: string }
+type Servico = { id: string; nome: string; secretaria: { sigla: string } }
+type Unidade = { id: string; nome: string }
 type Agenda = {
-  id: number
+  id: string
   dataDisponivel: string
   horaInicio: string
   horaFim: string
   vagasTotal: number
   vagasDisponiveis: number
-  servico: { id: number; nome: string }
-  unidade: { id: number; nome: string }
+  servico: { id: string; nome: string }
+  unidade: { id: string; nome: string }
   _count: { agendamentos: number }
 }
 
@@ -68,8 +68,8 @@ export function AgendaManager({ agendas: inicial, servicos, unidades }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          servicoId: Number(form.servicoId),
-          unidadeId: Number(form.unidadeId),
+          servicoId: form.servicoId,
+          unidadeId: form.unidadeId,
           data: form.data,
           horaInicio: form.horaInicio,
           horaFim: form.horaFim,

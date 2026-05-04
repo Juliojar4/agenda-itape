@@ -23,7 +23,7 @@ export function useCancelarAgendamento() {
       id,
       motivo,
     }: {
-      id: number
+      id: string
       motivo?: string
     }) => {
       const res = await fetch(`/api/agendamentos/${id}`, {
@@ -50,9 +50,9 @@ export function useCriarAgendamento() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: {
-      agendaId: number
-      servicoId: number
-      unidadeId: number
+      agendaId: string
+      servicoId: string
+      unidadeId: string
     }) => {
       const res = await fetch("/api/agendamentos", {
         method: "POST",
