@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Secretaria {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(cuid())
   nome      String
   sigla     String
   telefone  String?
@@ -25,8 +25,8 @@ model Secretaria {
 }
 
 model UnidadeAtendimento {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  secretariaId String  @map("id_secretaria") @db.ObjectId
+  id           String  @id @default(cuid())
+  secretariaId String  @map("id_secretaria")
   nome         String
   endereco     String
   bairro       String
@@ -45,8 +45,8 @@ model UnidadeAtendimento {
 }
 
 model Servico {
-  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
-  secretariaId          String   @map("id_secretaria") @db.ObjectId
+  id                    String   @id @default(cuid())
+  secretariaId          String   @map("id_secretaria")
   nome                  String
   descricao             String?
   tempoMedioMinutos     Int      @default(30) @map("tempo_medio_minutos")
@@ -62,7 +62,7 @@ model Servico {
 }
 
 model Cidadao {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                 String   @id @default(cuid())
   nome               String
   cpf                String   @unique
   dataNascimento     DateTime @map("data_nascimento")
@@ -85,7 +85,7 @@ model Cidadao {
 }
 
 model PerfilAcesso {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(cuid())
   nome      String  @unique
   descricao String?
 
@@ -95,14 +95,14 @@ model PerfilAcesso {
 }
 
 model Usuario {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  id              String    @id @default(cuid())
   nome            String
   cpf             String    @unique
   email           String    @unique
   senhaHash       String    @map("senha_hash")
-  perfilId        String    @map("id_perfil") @db.ObjectId
-  secretariaId    String?   @map("id_secretaria") @db.ObjectId
-  unidadeId       String?   @map("id_unidade") @db.ObjectId
+  perfilId        String    @map("id_perfil")
+  secretariaId    String?   @map("id_secretaria")
+  unidadeId       String?   @map("id_unidade")
   ativo           Boolean   @default(true)
   tentativasLogin Int       @default(0) @map("tentativas_login")
   bloqueadoAte    DateTime? @map("bloqueado_ate")
@@ -118,9 +118,9 @@ model Usuario {
 }
 
 model Agenda {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  servicoId        String   @map("id_servico") @db.ObjectId
-  unidadeId        String   @map("id_unidade") @db.ObjectId
+  id               String   @id @default(cuid())
+  servicoId        String   @map("id_servico")
+  unidadeId        String   @map("id_unidade")
   dataDisponivel   DateTime @map("data_disponivel")
   horaInicio       DateTime @map("hora_inicio")
   horaFim          DateTime @map("hora_fim")
@@ -136,11 +136,11 @@ model Agenda {
 }
 
 model Agendamento {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  cidadaoId          String   @map("id_cidadao") @db.ObjectId
-  agendaId           String   @map("id_agenda") @db.ObjectId
-  servicoId          String   @map("id_servico") @db.ObjectId
-  unidadeId          String   @map("id_unidade") @db.ObjectId
+  id                 String   @id @default(cuid())
+  cidadaoId          String   @map("id_cidadao")
+  agendaId           String   @map("id_agenda")
+  servicoId          String   @map("id_servico")
+  unidadeId          String   @map("id_unidade")
   dataAgendamento    DateTime @map("data_agendamento")
   horaAgendamento    DateTime @map("hora_agendamento")
   status             String   @default("AGENDADO")
@@ -159,9 +159,9 @@ model Agendamento {
 }
 
 model Atendimento {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  agendamentoId       String   @unique @map("id_agendamento") @db.ObjectId
-  usuarioAtendenteId  String   @map("id_usuario_atendente") @db.ObjectId
+  id                  String   @id @default(cuid())
+  agendamentoId       String   @unique @map("id_agendamento")
+  usuarioAtendenteId  String   @map("id_usuario_atendente")
   status              String
   tempoEfetivoMinutos Int?     @map("tempo_efetivo_minutos")
   observacoes         String?
@@ -174,9 +174,9 @@ model Atendimento {
 }
 
 model Notificacao {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  cidadaoId     String    @map("id_cidadao") @db.ObjectId
-  agendamentoId String?   @map("id_agendamento") @db.ObjectId
+  id            String    @id @default(cuid())
+  cidadaoId     String    @map("id_cidadao")
+  agendamentoId String?   @map("id_agendamento")
   tipo          String
   canal         String    @default("EMAIL")
   titulo        String
@@ -192,8 +192,8 @@ model Notificacao {
 }
 
 model LogAuditoria {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  usuarioId       String?  @map("id_usuario") @db.ObjectId
+  id              String   @id @default(cuid())
+  usuarioId       String?  @map("id_usuario")
   acao            String
   tabelaAfetada   String?  @map("tabela_afetada")
   registroId      String?  @map("registro_id")
